@@ -291,11 +291,9 @@ kbd {
   position: absolute;
   inset: -40% 0 auto;
   height: 720px;
-  background: radial-gradient(
-    circle at 50% 35%,
-    rgba(109, 74, 255, 0.13),
-    transparent 58%
-  );
+  background: radial-gradient(circle at 50% 35%,
+      rgba(109, 74, 255, 0.13),
+      transparent 58%);
   pointer-events: none;
 }
 
@@ -554,12 +552,10 @@ kbd {
   align-items: center;
   border: 1px solid var(--border);
   border-radius: 24px;
-  background: linear-gradient(
-    135deg,
-    #ffffff 0%,
-    #f7f4ff 55%,
-    #eeeaff 100%
-  );
+  background: linear-gradient(135deg,
+      #ffffff 0%,
+      #f7f4ff 55%,
+      #eeeaff 100%);
 }
 
 .atlas-banner h2 {
@@ -613,11 +609,9 @@ kbd {
   text-align: center;
   border: 1px solid var(--border);
   border-radius: 24px;
-  background: radial-gradient(
-      circle at 50% 0%,
+  background: radial-gradient(circle at 50% 0%,
       rgba(109, 74, 255, 0.16),
-      transparent 65%
-    ),
+      transparent 65%),
     var(--surface);
 }
 
@@ -995,7 +989,7 @@ kbd {
   color: #3b3552;
 }
 
-.callout > :last-child {
+.callout> :last-child {
   margin-bottom: 0;
 }
 
@@ -1037,7 +1031,7 @@ kbd {
 }
 
 /* inline code */
-.doc-body :not(pre) > code {
+.doc-body :not(pre)>code {
   padding: 2px 6px;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -1271,6 +1265,7 @@ kbd {
     opacity: 0;
     transform: translateY(-8px) scale(0.985);
   }
+
   to {
     opacity: 1;
     transform: none;
@@ -1406,11 +1401,9 @@ kbd {
   position: absolute;
   inset: -35% 0 auto;
   height: 640px;
-  background: radial-gradient(
-    circle at 50% 40%,
-    rgba(109, 74, 255, 0.14),
-    transparent 60%
-  );
+  background: radial-gradient(circle at 50% 40%,
+      rgba(109, 74, 255, 0.14),
+      transparent 60%);
 }
 
 .soon-hero__inner {
@@ -1535,6 +1528,7 @@ kbd {
   .header-nav {
     display: none;
   }
+
   .search-trigger {
     min-width: 0;
     width: 40px;
@@ -1570,7 +1564,7 @@ kbd {
     transform: translateX(-105%);
     width: min(320px, 85vw);
     flex-basis: auto;
-    height: calc(100dvh - var(--header-h));
+    height: 100%;
     background: var(--surface);
     box-shadow: 18px 0 50px rgba(23, 19, 43, 0.18);
     transition: transform 240ms cubic-bezier(0.32, 0.72, 0, 1);
@@ -1613,13 +1607,6 @@ kbd {
   }
 }
 
-/* 2xl 1536 */
-@media (min-width: 1536px) {
-  .docs-sidebar {
-    padding-left: max(24px, calc((100vw - 1536px) / 2 + 24px));
-  }
-}
-
 /* reduced motion */
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -1640,10 +1627,12 @@ kbd {
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-7px);
   }
