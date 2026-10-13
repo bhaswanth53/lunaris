@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Storage — Lunaris Documentation</title>
+  <meta name="description" content="Store and serve files in Lunaris with the Storage facade, private and public disks, uploads, and the safe LocalDriver.">
+  <meta name="theme-color" content="#6d4aff">
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/prism-lunaris.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <button class="icon-btn" id="sidebarToggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <a class="brand" href="../" aria-label="Lunaris home">
+        <img src="../assets/img/logo-bg.png" alt="">
+        <span>Lunaris<em>.</em></span>
+      </a>
+      <nav class="header-nav" aria-label="Primary">
+        <a href="index.html" class="is-active">Documentation</a>
+        <a href="../atlas.html">Atlas</a>
+        <a href="../index.html#features">Features</a>
+        <a href="../index.html#ecosystem">Ecosystem</a>
+      </nav>
+      <div class="header-actions">
+        <button class="search-trigger" type="button" data-search-open aria-label="Search documentation">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span class="st-label">Search docs</span>
+          <kbd>Ctrl K</kbd>
+        </button>
+        <a class="btn btn-primary btn-sm" href="installation.html">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="docs-shell">
+    <aside class="docs-sidebar" id="docsSidebar">
+      <div class="nav-group">
+        <span class="nav-group__title">Getting Started</span>
+        <a href="index.html">Introduction</a>
+        <a href="installation.html">Installation</a>
+        <a href="architecture.html">Architecture</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Core</span>
+        <a href="configuration.html">Configuration</a>
+        <a href="routing.html">Routing</a>
+        <a href="actions.html">Actions &amp; Responses</a>
+        <a href="middlewares.html">Middlewares &amp; Security</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Front-end</span>
+        <a href="views.html">Views &amp; Templates</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Data &amp; Storage</span>
+        <a href="validation.html">Validation &amp; Sessions</a>
+        <a href="storage.html" class="is-active">Storage</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Operations</span>
+        <a href="logging.html">Logging &amp; Errors</a>
+        <a href="cli.html">Console (CLI)</a>
+        <a href="support.html">Support &amp; Example</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Ecosystem</span>
+        <a href="../atlas.html">Atlas <span class='nav-soon'>SOON</span></a>
+      </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="docs-main">
+      <main class="docs-content">
+        <article class="doc-body">
+          <div class="page-meta"><span class="tag">Data & Storage</span></div>
+          <h1>Storage</h1>
+          <p class="lead">Lunaris ships a tiny filesystem abstraction: the <code>Storage</code> facade maps named disks to pluggable drivers, so reading, writing and serving files never touches a raw path.</p>
+
+
+          <h2>Disks</h2>
+          <p>
+            Two local disks are registered at boot from <code>config("storage.disks.*")</code>.
+            Each disk has a driver and a root directory:
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Disk</th><th>Driver</th><th>Root</th><th>Purpose</th></tr></thead>
+              <tbody>
+                <tr><td><code>private</code></td><td><code>LocalDriver</code></td><td><code>storage/app</code> (<code>storage_path("app")</code>)</td><td>Application files that are never served directly.</td></tr>
+                <tr><td><code>public</code></td><td><code>LocalDriver</code></td><td><code>public/storage</code> (<code>public_path("storage")</code>)</td><td>Files intended to be web-accessible.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Disks are declared in <code>config/vars.php</code>:</p>
+<pre><code class="language-php">"storage" =&gt; [
+    "disks" =&gt; [
+        "private" =&gt; [
+            "driver" =&gt; "private",
+            "root"   =&gt; storage_path("app")
+        ],
+        "public" =&gt; [
+            "driver" =&gt; "public",
+            "root"   =&gt; public_path("storage")
+        ]
+    ]
+],</code></pre>
+
+          <h2>Getting a driver</h2>
+          <p>
+            Resolve a disk through the <code>Storage</code> facade — never by building a path
+            yourself:
+          </p>
+<pre><code class="language-php">use System\Support\Storage\Storage;
+
+$disk = Storage::private();        // the private disk
+$disk = Storage::public();         // the public disk
+$disk = Storage::driver("public"); // by name</code></pre>
+          <p>A missing driver name throws an <code>InvalidArgumentException</code>.</p>
+
+          <h2>The <code>StorageDriver</code> contract</h2>
+          <p>Every driver implements <code>System\Support\Storage\StorageDriver</code>:</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>put(string $path, string $contents)</code></td><td><code>bool</code></td><td>Write <code>$contents</code> to <code>$path</code>, creating parent directories.</td></tr>
+                <tr><td><code>putUploadedFile(string $dir, array $file, ?string $name = null)</code></td><td><code>string|false</code></td><td>Store a <code>$_FILES</code> entry; returns the stored <strong>relative path</strong>, or <code>false</code>.</td></tr>
+                <tr><td><code>get(string $path)</code></td><td><code>string</code></td><td>Read a file's contents (throws if missing).</td></tr>
+                <tr><td><code>exists(string $path)</code></td><td><code>bool</code></td><td>True if a regular file exists at <code>$path</code>.</td></tr>
+                <tr><td><code>delete(string $path)</code></td><td><code>bool</code></td><td>Delete a regular file.</td></tr>
+                <tr><td><code>move(string $from, string $to)</code></td><td><code>bool</code></td><td>Move/rename a file.</td></tr>
+                <tr><td><code>copy(string $from, string $to)</code></td><td><code>bool</code></td><td>Copy a file.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Using the private disk</h2>
+<pre><code class="language-php">use System\Support\Storage\Storage;
+
+$disk = Storage::private();
+
+$disk-&gt;put("reports/2026.txt", "hello");       // writes storage/app/reports/2026.txt
+$disk-&gt;exists("reports/2026.txt");             // true
+$contents = $disk-&gt;get("reports/2026.txt");    // "hello"
+$disk-&gt;copy("reports/2026.txt", "reports/2026.bak");
+$disk-&gt;move("reports/2026.bak", "archive/2026.bak");
+$disk-&gt;delete("reports/2026.txt");</code></pre>
+
+          <h2>Handling uploads</h2>
+          <p>
+            <code>putUploadedFile()</code> stores an entry from <code>$_FILES</code> and returns
+            the relative path you can persist (or <code>false</code> on any failure):
+          </p>
+<pre><code class="language-php">$path = Storage::public()-&gt;putUploadedFile("avatars", $_FILES["avatar"]);
+
+if ($path === false) {
+    return response()-&gt;status(422)-&gt;json(["error" =&gt; "Upload failed"]);
+}
+
+// $path is e.g. "avatars/1a2b.png" → served from public/storage/avatars/1a2b.png</code></pre>
+          <p>
+            The uploaded file name is sanitized — anything but <code>[A-Za-z0-9._-]</code> becomes
+            <code>_</code> — and the original basename is used when no explicit name is given.
+          </p>
+
+          <h2><code>LocalDriver</code> guarantees</h2>
+          <p>
+            <code>System\Support\Storage\Drivers\LocalDriver</code> is the built-in driver, and
+            it is defensive by design:
+          </p>
+          <ul>
+            <li><strong>Path containment.</strong> Every path is resolved against the disk root and validated with <code>Path::assertContained()</code> — traversal (<code>..</code>), absolute paths, backslashes and null bytes are rejected.</li>
+            <li><strong>No symlinks.</strong> Reads, writes, moves, copies and deletes refuse to operate on symbolic links or on files that resolve outside the root.</li>
+            <li><strong>Uploads only.</strong> <code>putUploadedFile()</code> returns <code>false</code> unless the entry is a genuine HTTP upload (<code>UPLOAD_ERR_OK</code> + <code>is_uploaded_file()</code>), so it cannot be used with arbitrary local paths.</li>
+            <li><strong>No overwrite.</strong> <code>putUploadedFile()</code> refuses to overwrite an existing target.</li>
+            <li><strong>Regular files only.</strong> <code>delete()</code> throws for anything that is not a regular file.</li>
+          </ul>
+
+          <h2>Path safety (<code>System\Support\Path</code>)</h2>
+          <p>
+            <code>Path</code> is the guard used by <code>LocalDriver</code>. Given a root
+            directory, it exposes:
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Method</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>normalize($path)</code></td><td>Rejects empty/absolute paths, <code>..</code>/<code>.</code> segments, backslashes and null bytes; returns a safe relative path.</td></tr>
+                <tr><td><code>resolve($path)</code></td><td>Joins the normalized relative path onto the root.</td></tr>
+                <tr><td><code>assertContained($path)</code></td><td>Confirms the path stays inside the root and traverses no symlinks (re-evaluates <code>realpath()</code> when the target exists).</td></tr>
+                <tr><td><code>ensureDirectory($path)</code></td><td>Creates the directory tree (mode <code>0755</code>) after validating containment.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+
+          <nav class="page-nav">
+            <a class="page-prev" href="validation.html">
+              <span class="dir">← Previous</span>
+              <span class="title">Validation & Sessions</span>
+            </a>
+            <a class="page-next" href="logging.html">
+              <span class="dir">Next →</span>
+              <span class="title">Logging & Errors</span>
+            </a>
+          </nav>
+
+          <p class="page-edit">Part of the Lunaris documentation · <a href="https://codeberg.org/lunarisphp/lunaris" target="_blank" rel="noopener noreferrer">Source on Codeberg</a> · MIT License</p>
+        </article>
+      </main>
+    </div>
+
+    <aside class="docs-toc" id="toc">
+      <div class="docs-toc__title">On this page</div>
+      <nav id="tocNav"></nav>
+    </aside>
+  </div>
+
+  <div class="search-modal" id="searchModal" role="dialog" aria-modal="true" aria-label="Search documentation">
+    <div class="search-modal__panel">
+      <div class="search-modal__input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="search-modal__input" id="searchInput" type="text" placeholder="Search the documentation…" autocomplete="off" spellcheck="false">
+        <span class="search-modal__esc">Esc</span>
+      </div>
+      <div class="search-results" id="searchResults"></div>
+      <div class="search-modal__foot">
+        <span><b>↑↓</b> navigate</span>
+        <span><b>↵</b> open</span>
+        <span><b>esc</b> close</span>
+      </div>
+    </div>
+  </div>
+
+  <script>window.LUNARIS_BASE = "../";</script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-dotenv.min.js"></script>
+  <script defer src="../assets/js/search-index.js"></script>
+  <script defer src="../assets/js/main.js"></script>
+</body>
+</html>

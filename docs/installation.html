@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Installation — Lunaris Documentation</title>
-  <meta name="description" content="Install the Lunaris PHP framework: requirements, composer install, .env setup, app key generation and Docker.">
+  <meta name="description" content="Install the Lunaris PHP framework: requirements, composer create-project, .env setup, app key generation and Docker.">
   <meta name="theme-color" content="#6d4aff">
   <link rel="icon" type="image/png" href="../assets/img/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -61,8 +61,9 @@
         <a href="views.html">Views &amp; Templates</a>
       </div>
       <div class="nav-group">
-        <span class="nav-group__title">Data &amp; Validation</span>
+        <span class="nav-group__title">Data &amp; Storage</span>
         <a href="validation.html">Validation &amp; Sessions</a>
+        <a href="storage.html">Storage</a>
       </div>
       <div class="nav-group">
         <span class="nav-group__title">Operations</span>
@@ -93,17 +94,34 @@
             <li><strong>Optional:</strong> Docker or Podman for the containerized environment.</li>
           </ul>
 
-          <h2>Install with Composer</h2>
-          <p>Clone the repository and install the dependencies:</p>
+          <h2>Create a new project</h2>
+          <p>
+            <code>lunaris/lunaris</code> is published as a Composer <em>project</em>, so the
+            fastest way to start is <code>create-project</code> — it fetches the framework and
+            installs its dependencies in one command:
+          </p>
+<pre><code class="language-bash"># Recommended — create a fresh application
+composer create-project lunaris/lunaris
+cd lunaris
+
+# Create your .env and generate the application encryption key
+cp .env.example .env
+php lunar key:generate</code></pre>
+          <p>Then point your web server at <code>public/</code>, or start the Docker environment below.</p>
+
+          <h2>Install from source</h2>
+          <p>
+            To track the repository itself, clone it from Codeberg and install its dependencies:
+          </p>
 <pre><code class="language-bash"># 1. Clone the repository
-git clone &lt;your-repo-url&gt; lunaris
+git clone https://codeberg.org/lunarisphp/lunaris.git lunaris
 cd lunaris
 
 # 2. Install dependencies
 composer install
 
-# 3. Create your .env file (based on the example below)
-#    .env is required — the application loads it at boot
+# 3. Create your .env file (see below)
+cp .env.example .env
 
 # 4. Generate the application encryption key
 php lunar key:generate
@@ -115,14 +133,18 @@ docker compose -f docker/docker-compose.yml up --build
 
           <h2>Create your <code>.env</code></h2>
           <p>
-            The <code>.env</code> file is loaded at boot with <code>vlucas/phpdotenv</code>
-            (immutable mode). It is <strong>required</strong> — the application will not boot
-            without it. Keys are read through the <code>env()</code> helper.
+            Copy the shipped <code>.env.example</code> to <code>.env</code>. It is loaded at boot
+            with <code>vlucas/phpdotenv</code> (immutable mode) and is <strong>required</strong> —
+            the application will not boot without it. Keys are read through the
+            <code>env()</code> helper.
           </p>
+<pre><code class="language-bash">cp .env.example .env</code></pre>
 <pre><code class="language-dotenv"># Defuse ASCII-safe key — generate with: php lunar key:generate
 APP_KEY=def0000042cec0...
 APP_NAME="Lunaris"
-APP_URL=http://lunaris</code></pre>
+APP_URL=http://lunaris
+# Optional — defaults to "1.0.0" when unset
+APP_VERSION=0.3.0</code></pre>
 
           <div class="callout callout--warning">
             <span class="callout__title">Never commit .env</span>

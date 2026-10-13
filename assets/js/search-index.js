@@ -28,13 +28,13 @@ window.LUNARIS_SEARCH_INDEX = [
     "crumb": "Introduction",
     "title": "The framework at a glance",
     "url": "docs/index.html#the-framework-at-a-glance",
-    "text": "Concern Where it lives HTTP routes routes/web.php Actions (no controllers) app/Actions/ Custom middlewares app/Middlewares/ Configuration config/vars.php + .env Views views/ — plain PHP Console comman"
+    "text": "Concern Where it lives HTTP routes routes/web.php Actions (no controllers) app/Actions/ Custom middlewares app/Middlewares/ Configuration config/vars.php + .env Views views/ — plain PHP Sessions & fla"
   },
   {
     "crumb": "Introduction",
     "title": "Where to go next",
     "url": "docs/index.html#where-to-go-next",
-    "text": "Page You’ll learn Installation Clone, install, generate your app key, run with Docker. Architecture The directory structure and the full request lifecycle. Routing Map URIs to actions, name routes, ge"
+    "text": "Page You’ll learn Installation Create a project with Composer, set up .env , generate your app key, run with Docker. Architecture The directory structure and the full request lifecycle. Routing Map UR"
   },
   {
     "crumb": "Documentation",
@@ -50,15 +50,21 @@ window.LUNARIS_SEARCH_INDEX = [
   },
   {
     "crumb": "Installation",
-    "title": "Install with Composer",
-    "url": "docs/installation.html#install-with-composer",
-    "text": "Clone the repository and install the dependencies:"
+    "title": "Create a new project",
+    "url": "docs/installation.html#create-a-new-project",
+    "text": "lunaris/lunaris is published as a Composer project , so the fastest way to start is create-project — it fetches the framework and installs its dependencies in one command:"
+  },
+  {
+    "crumb": "Installation",
+    "title": "Install from source",
+    "url": "docs/installation.html#install-from-source",
+    "text": "To track the repository itself, clone it from Codeberg and install its dependencies:"
   },
   {
     "crumb": "Installation",
     "title": "Create your .env",
     "url": "docs/installation.html#create-your-env",
-    "text": "The .env file is loaded at boot with vlucas/phpdotenv (immutable mode). It is required — the application will not boot without it. Keys are read through the env() helper."
+    "text": "Copy the shipped .env.example to .env . It is loaded at boot with vlucas/phpdotenv (immutable mode) and is required — the application will not boot without it. Keys are read through the env() helper."
   },
   {
     "crumb": "Installation",
@@ -581,6 +587,54 @@ window.LUNARIS_SEARCH_INDEX = [
     "title": "License",
     "url": "docs/support.html#license",
     "text": "MIT — see composer.json ."
+  },
+  {
+    "crumb": "Documentation",
+    "title": "Storage",
+    "url": "docs/storage.html",
+    "text": "Lunaris ships a tiny filesystem abstraction: the Storage facade maps named disks to pluggable drivers, so reading, writing and serving files never touches a raw path."
+  },
+  {
+    "crumb": "Storage",
+    "title": "Disks",
+    "url": "docs/storage.html#disks",
+    "text": "Two local disks are registered at boot from config(\"storage.disks.*\") . Each disk has a driver and a root directory:"
+  },
+  {
+    "crumb": "Storage",
+    "title": "Getting a driver",
+    "url": "docs/storage.html#getting-a-driver",
+    "text": "Resolve a disk through the Storage facade — never by building a path yourself:"
+  },
+  {
+    "crumb": "Storage",
+    "title": "The StorageDriver contract",
+    "url": "docs/storage.html#the-storagedriver-contract",
+    "text": "Every driver implements System\\Support\\Storage\\StorageDriver :"
+  },
+  {
+    "crumb": "Storage",
+    "title": "Using the private disk",
+    "url": "docs/storage.html#using-the-private-disk",
+    "text": "Handling uploads putUploadedFile() stores an entry from $_FILES and returns the relative path you can persist (or false on any failure):"
+  },
+  {
+    "crumb": "Storage",
+    "title": "Handling uploads",
+    "url": "docs/storage.html#handling-uploads",
+    "text": "putUploadedFile() stores an entry from $_FILES and returns the relative path you can persist (or false on any failure):"
+  },
+  {
+    "crumb": "Storage",
+    "title": "LocalDriver guarantees",
+    "url": "docs/storage.html#localdriver-guarantees",
+    "text": "System\\Support\\Storage\\Drivers\\LocalDriver is the built-in driver, and it is defensive by design:"
+  },
+  {
+    "crumb": "Storage",
+    "title": "Path safety ( System\\Support\\Path )",
+    "url": "docs/storage.html#path-safety-systemsupportpath-",
+    "text": "Path is the guard used by LocalDriver . Given a root directory, it exposes:"
   },
   {
     "crumb": "Ecosystem",

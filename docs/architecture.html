@@ -61,8 +61,9 @@
         <a href="views.html">Views &amp; Templates</a>
       </div>
       <div class="nav-group">
-        <span class="nav-group__title">Data &amp; Validation</span>
+        <span class="nav-group__title">Data &amp; Storage</span>
         <a href="validation.html">Validation &amp; Sessions</a>
+        <a href="storage.html">Storage</a>
       </div>
       <div class="nav-group">
         <span class="nav-group__title">Operations</span>
@@ -87,11 +88,15 @@
 
           <h2>Directory structure</h2>
 <pre><code class="language-text">lunaris/
-├── .env                  # Environment variables (APP_KEY, APP_NAME, APP_URL)
+├── .env                  # Environment variables (APP_KEY, APP_NAME, APP_URL, APP_VERSION)
+├── .env.example          # Template for your .env
+├── .gitignore
 ├── .htaccess             # Front-controller rewrite + blocks .env / *.log
-├── bootstrap.php         # Wires config, env, root path, logs, routes
+├── bootstrap.php         # Wires root path, config, env, logs, storage disks, routes
+├── CHANGELOG.md          # Keep a Changelog format
 ├── composer.json         # PSR-4: System\ → system/, App\ → app/
-├── helpers.php           # Global helpers placeholder (autoloaded)
+├── CONTRIBUTING.md       # Contribution workflow and conventions
+├── helpers.php           # Global helpers placeholder (autoloaded, currently empty)
 ├── lunar                 # CLI entry point (php lunar &lt;command&gt;)
 ├── app/
 │   ├── Actions/          # Actions (no controllers!)
@@ -106,17 +111,20 @@
 │   └── podman-compose.yml
 ├── public/               # The web root
 │   ├── index.php         # Front controller (entry point)
-│   └── .htaccess
+│   ├── .htaccess
+│   ├── logo.png          # Static assets
+│   └── storage/          # Root of the public storage disk (served directly)
 ├── routes/
 │   ├── web.php           # HTTP routes
 │   └── console.php       # CLI command registry
 ├── storage/
-│   ├── app/              # General application storage
-│   └── logs/             # Daily log files (YYYY-MM-DD.log)
+│   ├── app/              # Root of the private storage disk (not web-served)
+│   └── logs/             # Daily log files (storage/logs/YYYY-MM-DD.log)
 ├── system/               # The framework itself (namespace System\)
+│   └── Support/Storage/  # Storage facade, driver contract, LocalDriver
 └── views/                # View templates
     ├── layouts/          # Layout templates (views/layouts/*.php)
-    ├── errors/           # Optional custom 403/404/500 pages
+    ├── errors/           # Optional custom 403/404/500 pages (empty by default)
     ├── primitives/       # Reusable inline partials (create as needed)
     └── components/       # Components with slot support (create as needed)</code></pre>
 
@@ -126,9 +134,9 @@
               <tbody>
                 <tr><td><code>app/</code></td><td>Application code — one class per route in <code>Actions/</code>, plus your own <code>Middlewares/</code>.</td></tr>
                 <tr><td><code>config/</code></td><td><code>vars.php</code>, the config array read by <code>config()</code>.</td></tr>
-                <tr><td><code>public/</code></td><td>Web root: front controller, rewrite rules, static assets.</td></tr>
+                <tr><td><code>public/</code></td><td>Web root: front controller, rewrite rules, static assets, and the public storage disk.</td></tr>
                 <tr><td><code>routes/</code></td><td><code>web.php</code> for HTTP routes, <code>console.php</code> for the command map.</td></tr>
-                <tr><td><code>storage/</code></td><td>App files and daily log files.</td></tr>
+                <tr><td><code>storage/</code></td><td>The private storage disk (<code>storage/app</code>) and daily log files.</td></tr>
                 <tr><td><code>system/</code></td><td>The framework source (<code>System\</code> namespace): Cli, Exceptions, Http, Logs, Routing, Security, Support, View.</td></tr>
                 <tr><td><code>views/</code></td><td>Plain-PHP templates, layouts, error pages, primitives, components.</td></tr>
                 <tr><td><code>vendor/</code></td><td>Composer dependencies (<code>vlucas/phpdotenv</code>, <code>defuse/php-encryption</code>, …).</td></tr>
@@ -144,8 +152,9 @@
 public/index.php                1. Creates storage/logs, wires PHP error log,
     │                              starts the session, loads vendor + bootstrap
     ▼
-Bootstrap::configure()          2. Config::init() → Container-&gt;loadEnv()
-    │                              → Root::registerRoot() → loadLogs()
+Bootstrap::configure()          2. Root::registerRoot() → Config::init()
+    │                              → Container-&gt;loadEnv() → loadLogs()
+    │                              → loadStorage() (registers private/public disks)
     ▼
 Container::loadRoutes()         3. require routes/web.php, then dispatch
     │
@@ -197,7 +206,7 @@ require_once __DIR__ . "/../bootstrap.php";
           <ul>
             <li><strong>Error display is off</strong>, errors are logged to <code>storage/logs/Y-m-d.log</code>.</li>
             <li><strong>Session cookies are hardened</strong> — <code>httponly</code>, <code>samesite=Lax</code>, <code>secure</code> on HTTPS — before <code>session_start()</code>.</li>
-            <li><strong>Bootstrap::configure()</strong> loads config, env, the root path, log drivers, and finally the routes.</li>
+            <li><strong>Bootstrap::configure()</strong> loads config, env, the root path, log drivers, registers the storage disks, and finally the routes.</li>
           </ul>
 
           <h3>The console lifecycle</h3>
