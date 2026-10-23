@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Runo — Builder & transactions — Lunaris Documentation</title>
+  <meta name="description" content="Use the Sql query builder for select/insert/update/delete, joins, where clauses, transactions, errors, and the API reference.">
+  <meta name="theme-color" content="#6d4aff">
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/prism-lunaris.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <button class="icon-btn" id="sidebarToggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <a class="brand" href="../" aria-label="Lunaris home">
+        <img src="../assets/img/logo-bg.png" alt="">
+        <span>Lunaris<em>.</em></span>
+      </a>
+      <nav class="header-nav" aria-label="Primary">
+        <a href="index.html" class="is-active">Documentation</a>
+        <a href="../runo.html">Runo</a>
+        <a href="../index.html#features">Features</a>
+        <a href="../index.html#ecosystem">Ecosystem</a>
+      </nav>
+      <div class="header-actions">
+        <button class="search-trigger" type="button" data-search-open aria-label="Search documentation">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span class="st-label">Search docs</span>
+          <kbd>Ctrl K</kbd>
+        </button>
+        <a class="btn btn-primary btn-sm" href="installation.html">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="docs-shell">
+    <aside class="docs-sidebar" id="docsSidebar">
+      <div class="nav-group">
+        <span class="nav-group__title">Getting Started</span>
+        <a href="index.html">Introduction</a>
+        <a href="installation.html">Installation</a>
+        <a href="architecture.html">Architecture</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Core</span>
+        <a href="configuration.html">Configuration</a>
+        <a href="routing.html">Routing</a>
+        <a href="actions.html">Actions &amp; Responses</a>
+        <a href="middlewares.html">Middlewares &amp; Security</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Front-end</span>
+        <a href="views.html">Views &amp; Templates</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Data &amp; Storage</span>
+        <a href="validation.html">Validation &amp; Sessions</a>
+        <a href="storage.html">Storage</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Operations</span>
+        <a href="logging.html">Logging &amp; Errors</a>
+        <a href="cli.html">Console (CLI)</a>
+        <a href="support.html">Support &amp; Example</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Runo</span>
+        <a href="runo.html">Overview &amp; setup</a>
+        <a href="runo-queries.html">Raw SQL &amp; results</a>
+        <a href="runo-records.html">Records &amp; query classes</a>
+        <a href="runo-builder.html" class="is-active">Builder &amp; transactions</a>
+      </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="docs-main">
+      <main class="docs-content">
+        <article class="doc-body">
+          <div class="page-meta"><span class="tag">Runo</span></div>
+          <h1>Runo — Builder &amp; transactions</h1>
+          <p class="lead">The <code>Sql</code> builder produces SQL strings and bindings but does not execute queries. Bindings use generated names like <code>:p0</code>, <code>:p1</code>...</p>
+
+
+          <h2>Using Sql</h2>
+<pre><code class="language-php">use Runo\DB;
+use Runo\Support\Sql;
+
+$query = Sql::table('posts');
+$sql = $query-&gt;toString();
+$args = $query-&gt;args();
+
+$result = DB::prepare($sql)-&gt;args($args)-&gt;execute();</code></pre>
+
+          <h2>SELECT</h2>
+<pre><code class="language-php">$query = Sql::table('posts')
+    -&gt;select(['id', 'title', 'status'])
+    -&gt;where('status', '=', 'published')
+    -&gt;orderBy('id', 'DESC')
+    -&gt;limit(10)
+    -&gt;offset(20);</code></pre>
+<pre><code class="language-sql">SELECT id, title, status FROM posts WHERE status = :p0 ORDER BY id DESC LIMIT 10 OFFSET 20</code></pre>
+          <p><code>select()</code> accepts column expressions; default is <code>['*']</code>.</p>
+
+          <h2>INSERT</h2>
+<pre><code class="language-php">$query = Sql::table('posts')-&gt;insert([
+    'title'      =&gt; 'Hello from the builder',
+    'status'     =&gt; 'draft',
+    'created_at' =&gt; Sql::raw('NOW()'),
+]);</code></pre>
+<pre><code class="language-sql">INSERT INTO posts (title, status, created_at) VALUES (:p0, :p1, NOW())</code></pre>
+          <p><code>Sql::raw()</code> inserts the value verbatim (never pass untrusted input). Multiple <code>insert()</code> calls merge columns; the builder inserts one row per statement.</p>
+
+          <h2>UPDATE</h2>
+<pre><code class="language-php">$query = Sql::table('posts')
+    -&gt;update('title', 'Updated title')
+    -&gt;update('status', 'published')
+    -&gt;where('id', '=', 1);</code></pre>
+<pre><code class="language-sql">UPDATE posts SET title = :p0, status = :p1 WHERE id = :p2</code></pre>
+
+          <h2>DELETE</h2>
+<pre><code class="language-php">$query = Sql::table('posts')-&gt;delete()-&gt;where('id', '=', 1);</code></pre>
+<pre><code class="language-sql">DELETE FROM posts WHERE id = :p0</code></pre>
+          <div class="callout callout--warning"><span class="callout__title">Safety</span><p><code>update()</code> and <code>delete()</code> have no built-in safety guard. Calling them without <code>where()</code> affects every row in the table.</p></div>
+
+          <h2>WHERE conditions</h2>
+          <p><code>where(string|callable $column, ?string $operator = null, mixed $value = null)</code>, <code>orWhere()</code> require an explicit operator:</p>
+<pre><code class="language-php">$query = Sql::table('posts')
+    -&gt;where('status', '=', 'published')
+    -&gt;where('views', '&gt;', 100)
+    -&gt;orWhere('status', '=', 'featured');</code></pre>
+<pre><code class="language-sql">SELECT * FROM posts WHERE status = :p0 AND views &gt; :p1 OR status = :p2</code></pre>
+
+          <h2>WHERE IN</h2>
+<pre><code class="language-php">$query = Sql::table('posts')-&gt;whereIn('id', [1, 2, 3]);</code></pre>
+<pre><code class="language-sql">SELECT * FROM posts WHERE id IN (:p0, :p1, :p2)</code></pre>
+          <p><code>whereIn()</code> always joins with <code>AND</code>. An empty array produces <code>IN ()</code> (invalid SQL) — guard against it.</p>
+
+          <h2>Nested WHERE groups</h2>
+<pre><code class="language-php">$query = Sql::table('posts')
+    -&gt;where(function (Sql $query) {
+        $query-&gt;where('status', '=', 'draft')
+            -&gt;where('user_id', '=', 1);
+    });</code></pre>
+          <p>Nested groups are syntactically supported but placeholder numbering can collide when combined with outer bindings (each <code>Sql</code> starts at <code>:p0</code>). Prefer flat conditions or raw SQL until this is addressed.</p>
+
+          <h2>JOIN</h2>
+<pre><code class="language-php">$query = Sql::table('posts')
+    -&gt;select(['posts.id', 'posts.title', 'users.name AS author'])
+    -&gt;join('users', 'users.id', '=', 'posts.user_id')
+    -&gt;where('posts.status', '=', 'published');</code></pre>
+<pre><code class="language-sql">SELECT posts.id, posts.title, users.name AS author FROM posts JOIN users ON users.id = posts.user_id WHERE posts.status = :p0</code></pre>
+          <p>Only inner <code>JOIN</code> is supported.</p>
+
+          <h2>ORDER BY, LIMIT, OFFSET</h2>
+<pre><code class="language-php">$query = Sql::table('posts')
+    -&gt;select(['id', 'title'])
+    -&gt;orderBy('id', 'DESC')
+    -&gt;orderBy('title', 'ASC')
+    -&gt;limit(25)
+    -&gt;offset(50);</code></pre>
+          <p><code>orderBy()</code> can be called multiple times; <code>limit()</code>/<code>offset()</code> accept integers. Using <code>offset()</code> without <code>limit()</code> may fail on MySQL.</p>
+
+          <h2>Builder method summary</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Method</th><th>Description</th><th>Returns</th></tr></thead>
+              <tbody>
+                <tr><td><code>Sql::table(string $table)</code></td><td>Start a query</td><td><code>Sql</code></td></tr>
+                <tr><td><code>Sql::raw(string $value)</code></td><td>Create a raw SQL fragment</td><td><code>Raw</code></td></tr>
+                <tr><td><code>select(array $columns)</code></td><td>Set select columns (default <code>['*']</code>)</td><td><code>Sql</code></td></tr>
+                <tr><td><code>insert(array $data)</code></td><td>Add insert values</td><td><code>Sql</code></td></tr>
+                <tr><td><code>update(string $column, mixed $value)</code></td><td>Add an update assignment</td><td><code>Sql</code></td></tr>
+                <tr><td><code>delete()</code></td><td>Mark as delete</td><td><code>Sql</code></td></tr>
+                <tr><td><code>where(...)</code></td><td>Add an <code>AND</code> condition or nested group</td><td><code>Sql</code></td></tr>
+                <tr><td><code>orWhere(...)</code></td><td>Add an <code>OR</code> condition or nested group</td><td><code>Sql</code></td></tr>
+                <tr><td><code>whereIn(string $column, array $values)</code></td><td>Add an <code>AND ... IN (...)</code> condition</td><td><code>Sql</code></td></tr>
+                <tr><td><code>join(string $table, string $first, string $operator, string $second)</code></td><td>Add an inner join</td><td><code>Sql</code></td></tr>
+                <tr><td><code>orderBy(string $column, string $direction = 'ASC')</code></td><td>Add an order clause</td><td><code>Sql</code></td></tr>
+                <tr><td><code>limit(int $limit)</code></td><td>Set the row limit</td><td><code>Sql</code></td></tr>
+                <tr><td><code>offset(int $offset)</code></td><td>Set the row offset</td><td><code>Sql</code></td></tr>
+                <tr><td><code>toString()</code></td><td>Build the SQL string</td><td><code>string</code></td></tr>
+                <tr><td><code>args()</code></td><td>Get the bound values</td><td><code>array</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Transactions</h2>
+          <h3>Closure-based</h3>
+<pre><code class="language-php">use Runo\DB;
+
+$postId = DB::transaction(function () {
+    $post = DB::prepare(
+        'INSERT INTO posts (title, status) VALUES (:title, :status)'
+    )-&gt;args([
+        ':title'  =&gt; 'Transactional post',
+        ':status' =&gt; 'draft',
+    ])-&gt;execute();
+
+    DB::prepare('UPDATE stats SET post_count = post_count + 1 WHERE id = 1')-&gt;execute();
+
+    return $post-&gt;meta()-&gt;id;
+});</code></pre>
+          <p>Commits on success, rolls back on any <code>Throwable</code> and rethrows it.</p>
+
+          <h3>Manual</h3>
+<pre><code class="language-php">use Runo\DB;
+
+DB::beginTransaction();
+
+try {
+    DB::prepare('INSERT INTO posts (title) VALUES (:title)')-&gt;args([':title' =&gt; 'Manual'])-&gt;execute();
+    DB::prepare('UPDATE stats SET post_count = post_count + 1 WHERE id = 1')-&gt;execute();
+    DB::commit();
+} catch (Throwable $e) {
+    DB::rollback();
+    throw $e;
+}</code></pre>
+          <p><code>beginTransaction()</code> does nothing if already active; <code>commit()</code>/<code>rollback()</code> check <code>inTransaction()</code>. No nested transactions/savepoints.</p>
+
+          <h2>Error handling and security</h2>
+          <ul>
+            <li><code>DB::prepare()</code> before <code>DB::init()</code> throws <code>Exception("Database not initialized.")</code>.</li>
+            <li>Passing a record class that does not extend <code>Record</code> throws <code>Exception("Invalid record class.")</code>.</li>
+            <li>Building an unknown query type in <code>Sql</code> throws <code>Exception("Invalid query type")</code>.</li>
+            <li>SQL errors/constraint violations/connection failures surface as <code>PDOException</code> (PDO is in <code>ERRMODE_EXCEPTION</code>).</li>
+            <li>Always use prepared statements/bindings for user input.</li>
+            <li>SQL passed to <code>DB::prepare()</code>, table/column names, join/order clauses, and <code>Sql::raw()</code> values are <strong>not</strong> escaped/quoted — validate/whitelist and never pass untrusted input to <code>raw()</code>.</li>
+            <li>Load credentials from environment variables, not inline in production.</li>
+          </ul>
+
+          <h2>API reference</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Class</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td><code>Runo\DB</code></td><td><code>init()</code>, <code>prepare()</code>, <code>transaction()</code>, <code>beginTransaction()</code>, <code>commit()</code>, <code>rollback()</code></td></tr>
+                <tr><td><code>Runo\Database\Statement</code></td><td><code>args()</code>, <code>cast()</code>, <code>as()</code>, <code>execute()</code>, <code>$id</code></td></tr>
+                <tr><td><code>Runo\Database\Query</code></td><td>abstract <code>sql()</code>, <code>run()</code>, static <code>execute($args=[])</code>, <code>$args</code>, <code>$casts</code>, <code>protected static $recordClass</code></td></tr>
+                <tr><td><code>Runo\Support\Sql</code></td><td>Builder (<code>table/select/insert/update/delete/where/orWhere/whereIn/join/orderBy/limit/offset/toString/args</code>), <code>raw()</code></td></tr>
+                <tr><td><code>Runo\Support\Result</code></td><td><code>meta()</code>, <code>getIterator()</code>, <code>count()</code>, <code>first()</code>, <code>toArray()</code>, <code>pluck()</code></td></tr>
+                <tr><td><code>Runo\Support\Record</code></td><td><code>__construct($attrs=[], $casts=[])</code>, <code>toArray()</code>, <code>__get/__set/__isset</code></td></tr>
+                <tr><td><code>Runo\Support\Attributes</code></td><td><code>id</code> (int), <code>affected</code> (int), <code>time</code> (float)</td></tr>
+                <tr><td><code>Runo\Support\Raw</code></td><td><code>__construct(string $value)</code>, <code>public $value</code></td></tr>
+                <tr><td><code>Runo\Support\Hydrator</code></td><td>Internal hydration component</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="page-edit">Part of the Lunaris documentation · <a href="https://codeberg.org/lunarisphp/runo" target="_blank" rel="noopener noreferrer">Source on Codeberg</a> · MIT License</p>
+
+
+          <nav class="page-nav">
+            <a class="page-prev" href="runo-records.html">
+              <span class="dir">← Previous</span>
+              <span class="title">Runo — Records & query classes</span>
+            </a>
+          </nav>
+
+          <p class="page-edit">Part of the Lunaris documentation · <a href="https://codeberg.org/lunarisphp/lunaris" target="_blank" rel="noopener noreferrer">Source on Codeberg</a> · MIT License</p>
+        </article>
+      </main>
+    </div>
+
+    <aside class="docs-toc" id="toc">
+      <div class="docs-toc__title">On this page</div>
+      <nav id="tocNav"></nav>
+    </aside>
+  </div>
+
+  <div class="search-modal" id="searchModal" role="dialog" aria-modal="true" aria-label="Search documentation">
+    <div class="search-modal__panel">
+      <div class="search-modal__input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="search-modal__input" id="searchInput" type="text" placeholder="Search the documentation…" autocomplete="off" spellcheck="false">
+        <span class="search-modal__esc">Esc</span>
+      </div>
+      <div class="search-results" id="searchResults"></div>
+      <div class="search-modal__foot">
+        <span><b>↑↓</b> navigate</span>
+        <span><b>↵</b> open</span>
+        <span><b>esc</b> close</span>
+      </div>
+    </div>
+  </div>
+
+  <script>window.LUNARIS_BASE = "../";</script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-dotenv.min.js"></script>
+  <script defer src="../assets/js/search-index.js"></script>
+  <script defer src="../assets/js/main.js"></script>
+</body>
+</html>

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Atlas — Coming Soon · Lunaris</title>
-  <meta name="description" content="Atlas, the minimal database engine for the Lunaris framework. Currently in development — coming soon.">
+  <title>Runo — Database engine for Lunaris</title>
+  <meta name="description" content="Runo is a minimal PDO database client and query builder for PHP. Raw SQL first, optional SQL builder, records & casts, query classes, and transactions.">
   <meta name="theme-color" content="#6d4aff">
   <link rel="icon" type="image/png" href="assets/img/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,7 +23,7 @@
 
       <nav class="header-nav" aria-label="Primary">
         <a href="docs/">Documentation</a>
-        <a href="atlas.html" class="is-active">Atlas</a>
+        <a href="runo.html" class="is-active">Runo</a>
         <a href="index.html#features">Features</a>
         <a href="index.html#ecosystem">Ecosystem</a>
       </nav>
@@ -34,89 +34,99 @@
           <span class="st-label">Search docs</span>
           <kbd>Ctrl K</kbd>
         </button>
-        <a class="btn btn-primary btn-sm" href="docs/">Get Started</a>
+        <a class="btn btn-primary btn-sm" href="docs/runo.html">Get Started</a>
       </div>
     </div>
   </header>
 
-  <section class="soon-hero">
-    <div class="soon-hero__inner">
+  <section class="runo-hero">
+    <div class="runo-hero__inner">
       <img src="assets/img/logo-bg.png" alt="Lunaris logo">
-      <span class="badge-soon">Coming soon</span>
-      <h1><span class="accent">Atlas</span>, the database engine for Lunaris</h1>
+      <span class="badge-released">v0.1.0 · Released</span>
+      <h1><span class="accent">Runo</span> — the database engine for Lunaris</h1>
       <p>
-        A minimal, PDO-based data layer that keeps raw SQL in your hands — with an
-        optional query builder, Active Record models and DTO hydration when you want them.
-        The package is being rebuilt from scratch and its public API is not final yet.
+        A minimal PDO database client and query builder for PHP. Raw SQL first,
+        optional SQL builder, records and casts, reusable query classes, and transactions.
+        Works as a standalone package or with Lunaris.
       </p>
 
       <div class="hero__actions">
-        <a class="btn btn-primary" href="https://codeberg.org/lunarisphp" target="_blank" rel="noopener noreferrer">Follow development ↗</a>
-        <a class="btn btn-secondary" href="docs/">Read Lunaris Docs</a>
+        <a class="btn btn-primary" href="docs/runo.html">Read Runo Docs →</a>
+        <a class="btn btn-secondary" href="https://codeberg.org/lunarisphp/runo" target="_blank" rel="noopener noreferrer">View Repository ↗</a>
       </div>
 
-      <div class="progress">
-        <div class="progress__label">
-          <span>Development status</span>
-          <span>Early stage · v0.2.2</span>
+      <div class="install-block">
+        <div class="install-block__bar">
+          <span>Terminal</span>
+          <button class="codeblock__copy" type="button">Copy</button>
         </div>
-        <div class="progress__track"><div class="progress__fill"></div></div>
+<pre><code>composer require lunaris/runo</code></pre>
       </div>
     </div>
   </section>
 
   <section class="section" style="padding-top:20px">
     <div class="section-head center">
-      <span class="eyebrow">Planned API</span>
-      <h2>What Atlas will bring</h2>
-      <p>A preview of the documented direction. Names and behaviour may change before the first stable release.</p>
+      <span class="eyebrow">Why Runo</span>
+      <h2>SQL in your hands. Bare-metal utilities when you need them.</h2>
+      <p>Not an ORM — just a thin, predictable layer over PDO.</p>
     </div>
 
     <div class="grid-3">
       <article class="feature-card">
         <div class="ico">🗄️</div>
         <h3>Raw SQL first</h3>
-        <p><code>Atlas::prepare(...)-&gt;args([...])-&gt;execute()</code> with prepared statements, named parameters and a rich result set.</p>
+        <p><code>DB::prepare()->args()->execute()</code> with named placeholders, typed binding, and a rich result set.</p>
       </article>
 
       <article class="feature-card">
         <div class="ico">🔍</div>
-        <h3>Probe query builder</h3>
-        <p>A fluent builder for select, insert, update and delete — where, orWhere, whereIn, joins, order, limit and offset.</p>
+        <h3>Query builder</h3>
+        <p>Optional <code>Sql</code> for select, insert, update, delete — where, whereIn, joins, order, limit, and offset.</p>
       </article>
 
       <article class="feature-card">
-        <div class="ico">🪐</div>
-        <h3>Planet models</h3>
-        <p>Active Record with <code>$table</code>, <code>$fillable</code>, <code>$hidden</code> and <code>$casts</code> — <code>find()</code>, <code>where()</code>, <code>save()</code>, <code>delete()</code>.</p>
+        <div class="ico">🧬</div>
+        <h3>Records &amp; casts</h3>
+        <p>Hydrate rows into <code>Record</code> objects with casting for int, float, bool, JSON, and <code>DateTimeInterface</code>.</p>
       </article>
 
       <article class="feature-card">
-        <div class="ico">💊</div>
-        <h3>Capsule DTOs</h3>
-        <p>Hydrate rows into typed objects with casting for int, float, bool, JSON, DateTime and more.</p>
-      </article>
-
-      <article class="feature-card">
-        <div class="ico">♻️</div>
-        <h3>Query objects</h3>
-        <p>Reusable, testable SQL classes: extend <code>Query</code>, implement <code>sql()</code>, run it with <code>Atlas::run()</code>.</p>
+        <div class="ico">📦</div>
+        <h3>Query classes</h3>
+        <p>Reusable, testable SQL objects: extend <code>Query</code>, implement <code>sql()</code>, run with <code>execute()</code> or <code>run()</code>.</p>
       </article>
 
       <article class="feature-card">
         <div class="ico">🔒</div>
-        <h3>Transactions &amp; drivers</h3>
-        <p>Closure-based transactions, insert-ID metadata, JSON-ready results — targeting MySQL, PostgreSQL and SQLite.</p>
+        <h3>Transactions</h3>
+        <p>Closure-based and manual transactions with commit/rollback and exception safety.</p>
+      </article>
+
+      <article class="feature-card">
+        <div class="ico">📊</div>
+        <h3>Metadata</h3>
+        <p>Last insert ID, affected/row counts, and execution time on every <code>Result</code>.</p>
       </article>
     </div>
 
     <div class="callout callout--info" style="margin-top:34px">
-      <span class="callout__title">Status</span>
+      <span class="callout__title">MySQL/MariaDB</span>
       <p>
-        Atlas is at an early stage: the source tree has been reset and is being rewritten.
-        Nothing on this page is a commitment — treat it as a roadmap. Documentation for
-        Atlas will land here once the package stabilises.
+        Runo currently targets MySQL/MariaDB via <code>pdo_mysql</code> with DSN
+        <code>mysql:host=...;port=...;dbname=...;charset=utf8mb4</code>. PHP 8.0+ required.
       </p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="cta">
+      <h2>Start using Runo</h2>
+      <p>Install the package, initialize the connection, and run your first prepared query.</p>
+      <div class="hero__actions">
+        <a class="btn btn-primary" href="docs/runo.html">Read the Docs</a>
+        <a class="btn btn-secondary" href="https://codeberg.org/lunarisphp/runo" target="_blank" rel="noopener noreferrer">Repository ↗</a>
+      </div>
     </div>
   </section>
 
@@ -142,7 +152,7 @@
       <div class="footer-col">
         <h4>Ecosystem</h4>
         <a href="docs/">Lunaris Framework</a>
-        <a href="atlas.html">Atlas <span class="soon">Soon</span></a>
+        <a href="runo.html">Runo</a>
         <a href="https://codeberg.org/lunarisphp/lunaris" target="_blank" rel="noopener noreferrer">Repository ↗</a>
       </div>
 
@@ -156,7 +166,7 @@
 
     <div class="site-footer__bottom">
       <span>© 2026 Lunaris · MIT License</span>
-      <span>Atlas docs are coming soon.</span>
+      <span>Built with plain HTML, CSS &amp; JS — just like the framework it documents.</span>
     </div>
   </footer>
 
@@ -181,7 +191,9 @@
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-dotenv.min.js"></script>
   <script defer src="assets/js/search-index.js"></script>
   <script defer src="assets/js/main.js"></script>
 </body>

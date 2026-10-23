@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Runo — Overview & setup — Lunaris Documentation</title>
+  <meta name="description" content="Runo is a minimal PDO database client and query builder for PHP. Install with composer require lunaris/runo, configure a connection, and run prepared queries.">
+  <meta name="theme-color" content="#6d4aff">
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/prism-lunaris.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <button class="icon-btn" id="sidebarToggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <a class="brand" href="../" aria-label="Lunaris home">
+        <img src="../assets/img/logo-bg.png" alt="">
+        <span>Lunaris<em>.</em></span>
+      </a>
+      <nav class="header-nav" aria-label="Primary">
+        <a href="index.html" class="is-active">Documentation</a>
+        <a href="../runo.html">Runo</a>
+        <a href="../index.html#features">Features</a>
+        <a href="../index.html#ecosystem">Ecosystem</a>
+      </nav>
+      <div class="header-actions">
+        <button class="search-trigger" type="button" data-search-open aria-label="Search documentation">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span class="st-label">Search docs</span>
+          <kbd>Ctrl K</kbd>
+        </button>
+        <a class="btn btn-primary btn-sm" href="installation.html">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="docs-shell">
+    <aside class="docs-sidebar" id="docsSidebar">
+      <div class="nav-group">
+        <span class="nav-group__title">Getting Started</span>
+        <a href="index.html">Introduction</a>
+        <a href="installation.html">Installation</a>
+        <a href="architecture.html">Architecture</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Core</span>
+        <a href="configuration.html">Configuration</a>
+        <a href="routing.html">Routing</a>
+        <a href="actions.html">Actions &amp; Responses</a>
+        <a href="middlewares.html">Middlewares &amp; Security</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Front-end</span>
+        <a href="views.html">Views &amp; Templates</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Data &amp; Storage</span>
+        <a href="validation.html">Validation &amp; Sessions</a>
+        <a href="storage.html">Storage</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Operations</span>
+        <a href="logging.html">Logging &amp; Errors</a>
+        <a href="cli.html">Console (CLI)</a>
+        <a href="support.html">Support &amp; Example</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Runo</span>
+        <a href="runo.html" class="is-active">Overview &amp; setup</a>
+        <a href="runo-queries.html">Raw SQL &amp; results</a>
+        <a href="runo-records.html">Records &amp; query classes</a>
+        <a href="runo-builder.html">Builder &amp; transactions</a>
+      </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="docs-main">
+      <main class="docs-content">
+        <article class="doc-body">
+          <div class="page-meta"><span class="tag">Runo</span></div>
+          <h1>Runo — Overview &amp; setup</h1>
+          <p class="lead">Runo is the database engine for the Lunaris framework, but it works as a standalone library. It is intentionally not an ORM: a thin utility layer over PDO for executing plain SQL, binding values, hydrating rows into objects, casting, and managing transactions.</p>
+
+
+          <h2>Philosophy</h2>
+          <p>
+            Runo does not provide high-level abstractions like other ORMs. Instead, it
+            encourages writing queries in plain SQL while providing bare-metal utilities
+            such as a PDO wrapper. Raw SQL through <code>DB::prepare()</code> is a
+            first-class path; the optional <code>Sql</code> builder is a convenience, not
+            a requirement.
+          </p>
+
+          <h2>Features</h2>
+          <ul>
+            <li>Static connection facade backed by one PDO instance</li>
+            <li>Fluent prepared statements with typed value binding</li>
+            <li>Plain SQL as the primary query path</li>
+            <li>Optional SQL builder for <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, and <code>DELETE</code></li>
+            <li>Reusable query classes with per-query casts and record classes</li>
+            <li>Automatic hydration of rows into <code>Record</code> objects</li>
+            <li>Column casting for integers, floats, booleans, JSON, and date/time classes</li>
+            <li>Result collections with iteration, counting, <code>first()</code>, <code>pluck()</code>, and <code>toArray()</code></li>
+            <li>Query metadata: last insert ID, affected row count, and execution time</li>
+            <li>Closure-based and manual transaction APIs</li>
+            <li>No runtime dependencies beyond PHP and PDO</li>
+            <li>PSR-4 autoloading under the <code>Runo\</code> namespace</li>
+          </ul>
+
+          <h2>Requirements</h2>
+          <ul>
+            <li>PHP 8.0 or newer (Docker image uses PHP 8.3)</li>
+            <li>The <code>PDO</code> extension and the PDO driver for your database (<code>pdo_mysql</code> required for MySQL/MariaDB)</li>
+            <li>MySQL or MariaDB</li>
+            <li>Composer for installation and autoloading</li>
+          </ul>
+
+          <h2>Installation</h2>
+          <p>Install with Composer:</p>
+<pre><code class="language-bash">composer require lunaris/runo</code></pre>
+          <p>Load the Composer autoloader:</p>
+<pre><code class="language-php">require __DIR__ . '/vendor/autoload.php';</code></pre>
+          <p>
+            For local development against a checked-out copy, add a Composer <code>path</code>
+            repository pointing to <code>../runo</code>.
+          </p>
+
+          <h2>Quick start</h2>
+<pre><code class="language-php">&lt;?php
+
+require __DIR__ . '/vendor/autoload.php';
+
+use Runo\DB;
+
+DB::init([
+    'driver'   =&gt; 'mysql',
+    'host'     =&gt; '127.0.0.1',
+    'port'     =&gt; 3306,
+    'database' =&gt; 'app',
+    'username' =&gt; 'root',
+    'password' =&gt; 'secret',
+]);
+
+$posts = DB::prepare(
+    'SELECT id, title FROM posts ORDER BY id DESC'
+)-&gt;execute();
+
+foreach ($posts as $post) {
+    echo $post-&gt;id . ': ' . $post-&gt;title . PHP_EOL;
+}
+
+echo 'Rows: ' . $posts-&gt;count() . PHP_EOL;</code></pre>
+
+          <h2>Configuration</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Key</th><th>Required</th><th>Example</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>driver</code></td><td>Yes</td><td><code>mysql</code></td><td>PDO driver used as the DSN prefix.</td></tr>
+                <tr><td><code>host</code></td><td>Yes</td><td><code>127.0.0.1</code></td><td>Database server hostname or IP address.</td></tr>
+                <tr><td><code>port</code></td><td>Yes</td><td><code>3306</code></td><td>Database server port.</td></tr>
+                <tr><td><code>database</code></td><td>Yes</td><td><code>app</code></td><td>Database name.</td></tr>
+                <tr><td><code>username</code></td><td>Yes</td><td><code>root</code></td><td>Database username.</td></tr>
+                <tr><td><code>password</code></td><td>Yes</td><td><code>secret</code></td><td>Database password. Can be an empty string.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>The generated DSN is always <code>{driver}:host={host};port={port};dbname={database};charset=utf8mb4</code>. PDO is configured with <code>ERRMODE_EXCEPTION</code>, <code>FETCH_OBJ</code>, and <code>EMULATE_PREPARES=false</code>.</p>
+
+          <h2>Connection lifecycle</h2>
+          <ul>
+            <li>The connection is stored in a static property and shared by every <code>DB</code> call.</li>
+            <li><code>DB::init()</code> only creates a connection when none exists; later calls are silently ignored.</li>
+            <li>There is no public method to close, reset, or replace the connection.</li>
+            <li><code>DB::prepare()</code> throws <code>Exception("Database not initialized.")</code> if <code>DB::init()</code> has not been called.</li>
+            <li><code>DB::commit()</code> and <code>DB::rollback()</code> assume a connection already exists.</li>
+          </ul>
+
+          <h2>Architecture</h2>
+<pre><code class="language-text">Raw SQL or Runo\Support\Sql
+            |
+            v
+      DB::prepare()
+            |
+            v
+   Runo\Database\Statement  (args / cast / as)
+            |
+            v
+   PDO prepares and executes
+            |
+            v
+   Runo\Support\Hydrator
+            |
+            v
+   Runo\Support\Result  (items: Record[], meta(): Attributes)</code></pre>
+
+          <h2>Project structure</h2>
+<pre><code class="language-text">runo/
+├── composer.json
+├── readme.md
+├── src/
+│   ├── DB.php
+│   ├── Database/
+│   │   ├── Query.php
+│   │   └── Statement.php
+│   └── Support/
+│       ├── Attributes.php
+│       ├── Hydrator.php
+│       ├── Raw.php
+│       ├── Record.php
+│       ├── Result.php
+│       └── Sql.php
+└── docker/  (local dev environment)</code></pre>
+
+          <h2>Local development with Docker</h2>
+          <p>From the project root: <code>docker compose -f docker/docker-compose.yml up --build</code>. Services include PHP 8.3 + Apache on <code>:8080</code> and MariaDB 10.11 on <code>:3306</code>.</p>
+
+          <h2>Known limitations</h2>
+          <ul>
+            <li>Only MySQL/MariaDB is targeted by the built-in DSN; one connection only.</li>
+            <li>All results are fetched eagerly; no lazy/streaming cursor.</li>
+            <li><code>Sql</code> is a builder only (no execution). When used with <code>Query</code>, bindings must be passed explicitly.</li>
+            <li>Nested <code>where()</code> groups can collide with placeholder names; <code>where()</code> requires an explicit operator.</li>
+            <li><code>whereIn([])</code> produces invalid SQL; <code>offset()</code> without <code>limit()</code> may fail on MySQL.</li>
+            <li><code>update()</code>/<code>delete()</code> without <code>where()</code> affect every row.</li>
+            <li>No nested transactions/savepoints; identifiers/Raw are not escaped.</li>
+            <li>Last insert ID is only detected for statements starting with <code>INSERT</code>.</li>
+          </ul>
+
+          <p class="page-edit">Part of the Lunaris documentation · <a href="https://codeberg.org/lunarisphp/runo" target="_blank" rel="noopener noreferrer">Source on Codeberg</a> · MIT License</p>
+
+
+          <nav class="page-nav">
+            <a class="page-prev" href="support.html">
+              <span class="dir">← Previous</span>
+              <span class="title">Support & Example</span>
+            </a>
+            <a class="page-next" href="runo-queries.html">
+              <span class="dir">Next →</span>
+              <span class="title">Runo — Raw SQL & results</span>
+            </a>
+          </nav>
+
+          <p class="page-edit">Part of the Lunaris documentation · <a href="https://codeberg.org/lunarisphp/lunaris" target="_blank" rel="noopener noreferrer">Source on Codeberg</a> · MIT License</p>
+        </article>
+      </main>
+    </div>
+
+    <aside class="docs-toc" id="toc">
+      <div class="docs-toc__title">On this page</div>
+      <nav id="tocNav"></nav>
+    </aside>
+  </div>
+
+  <div class="search-modal" id="searchModal" role="dialog" aria-modal="true" aria-label="Search documentation">
+    <div class="search-modal__panel">
+      <div class="search-modal__input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="search-modal__input" id="searchInput" type="text" placeholder="Search the documentation…" autocomplete="off" spellcheck="false">
+        <span class="search-modal__esc">Esc</span>
+      </div>
+      <div class="search-results" id="searchResults"></div>
+      <div class="search-modal__foot">
+        <span><b>↑↓</b> navigate</span>
+        <span><b>↵</b> open</span>
+        <span><b>esc</b> close</span>
+      </div>
+    </div>
+  </div>
+
+  <script>window.LUNARIS_BASE = "../";</script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-dotenv.min.js"></script>
+  <script defer src="../assets/js/search-index.js"></script>
+  <script defer src="../assets/js/main.js"></script>
+</body>
+</html>

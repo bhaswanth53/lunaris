@@ -527,6 +527,8 @@ kbd {
   margin: 0;
   padding: 18px 20px 20px;
   overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   color: #e7e3ff;
   font-size: 13.5px;
   line-height: 1.7;
@@ -539,8 +541,8 @@ kbd {
   font-size: inherit;
 }
 
-/* Atlas teaser */
-.atlas-banner {
+/* Runo banner */
+.runo-banner {
   position: relative;
   overflow: hidden;
   width: min(1120px, calc(100% - 40px));
@@ -558,20 +560,20 @@ kbd {
       #eeeaff 100%);
 }
 
-.atlas-banner h2 {
+.runo-banner h2 {
   margin: 12px 0 0;
   font-size: clamp(26px, 3.4vw, 36px);
   letter-spacing: -0.03em;
   line-height: 1.12;
 }
 
-.atlas-banner p {
+.runo-banner p {
   margin: 14px 0 0;
   color: var(--muted);
   font-size: 16px;
 }
 
-.badge-soon {
+.badge-released {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -585,13 +587,13 @@ kbd {
   text-transform: uppercase;
 }
 
-.atlas-pills {
+.runo-pills {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.atlas-pills span {
+.runo-pills span {
   padding: 7px 13px;
   border: 1px solid var(--border-hover);
   border-radius: 999px;
@@ -676,18 +678,6 @@ kbd {
 
 .footer-col a:hover {
   color: var(--violet-dark);
-}
-
-.footer-col a .soon {
-  margin-left: 6px;
-  padding: 1px 7px;
-  border-radius: 999px;
-  background: var(--violet-soft);
-  color: var(--violet-dark);
-  font-size: 10.5px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
 }
 
 .site-footer__bottom {
@@ -785,11 +775,6 @@ kbd {
   font-size: 9.5px;
   font-weight: 800;
   letter-spacing: 0.06em;
-}
-
-.nav-group a.is-active .nav-soon {
-  background: rgba(255, 255, 255, 0.22);
-  color: #fff;
 }
 
 .sidebar-overlay {
@@ -1028,6 +1013,11 @@ kbd {
 
 .callout--info .callout__title {
   color: #1d4ed8;
+}
+
+.callout code,
+.feature-card code {
+  overflow-wrap: anywhere;
 }
 
 /* inline code */
@@ -1387,16 +1377,16 @@ kbd {
 }
 
 /* ============================================================
-   ATLAS PAGE
+   RUNO PAGE
    ============================================================ */
-.soon-hero {
+.runo-hero {
   position: relative;
   overflow: hidden;
   text-align: center;
   padding: 92px 20px 70px;
 }
 
-.soon-hero::before {
+.runo-hero::before {
   content: "";
   position: absolute;
   inset: -35% 0 auto;
@@ -1406,63 +1396,34 @@ kbd {
       transparent 60%);
 }
 
-.soon-hero__inner {
+.runo-hero__inner {
   position: relative;
   width: min(760px, 100%);
   margin: 0 auto;
 }
 
-.soon-hero img {
+.runo-hero img {
   width: 108px;
   margin: 0 auto 24px;
   filter: drop-shadow(0 16px 26px rgba(109, 74, 255, 0.2));
 }
 
-.soon-hero h1 {
+.runo-hero h1 {
   margin: 18px 0 0;
   font-size: clamp(38px, 6vw, 62px);
   letter-spacing: -0.05em;
   line-height: 1.02;
 }
 
-.soon-hero h1 .accent {
+.runo-hero h1 .accent {
   color: var(--violet);
 }
 
-.soon-hero p {
+.runo-hero p {
   margin: 20px auto 0;
   max-width: 580px;
   color: var(--muted);
   font-size: 17.5px;
-}
-
-.progress {
-  width: min(420px, 100%);
-  margin: 36px auto 0;
-  text-align: left;
-}
-
-.progress__label {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 650;
-}
-
-.progress__track {
-  height: 9px;
-  border-radius: 999px;
-  background: var(--border);
-  overflow: hidden;
-}
-
-.progress__fill {
-  height: 100%;
-  width: 18%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--violet), var(--violet-dark));
 }
 
 /* ============================================================
@@ -1493,7 +1454,7 @@ kbd {
     padding: 52px 0;
   }
 
-  .atlas-banner {
+  .runo-banner {
     width: calc(100% - 32px);
     grid-template-columns: 1fr;
     padding: 30px 24px;

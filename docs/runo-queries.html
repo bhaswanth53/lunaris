@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Runo — Raw SQL & results — Lunaris Documentation</title>
+  <meta name="description" content="Use DB::prepare() with args(), fetch results, work with metadata, and run inserts/updates/deletes.">
+  <meta name="theme-color" content="#6d4aff">
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/prism-lunaris.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <button class="icon-btn" id="sidebarToggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <a class="brand" href="../" aria-label="Lunaris home">
+        <img src="../assets/img/logo-bg.png" alt="">
+        <span>Lunaris<em>.</em></span>
+      </a>
+      <nav class="header-nav" aria-label="Primary">
+        <a href="index.html" class="is-active">Documentation</a>
+        <a href="../runo.html">Runo</a>
+        <a href="../index.html#features">Features</a>
+        <a href="../index.html#ecosystem">Ecosystem</a>
+      </nav>
+      <div class="header-actions">
+        <button class="search-trigger" type="button" data-search-open aria-label="Search documentation">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span class="st-label">Search docs</span>
+          <kbd>Ctrl K</kbd>
+        </button>
+        <a class="btn btn-primary btn-sm" href="installation.html">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="docs-shell">
+    <aside class="docs-sidebar" id="docsSidebar">
+      <div class="nav-group">
+        <span class="nav-group__title">Getting Started</span>
+        <a href="index.html">Introduction</a>
+        <a href="installation.html">Installation</a>
+        <a href="architecture.html">Architecture</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Core</span>
+        <a href="configuration.html">Configuration</a>
+        <a href="routing.html">Routing</a>
+        <a href="actions.html">Actions &amp; Responses</a>
+        <a href="middlewares.html">Middlewares &amp; Security</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Front-end</span>
+        <a href="views.html">Views &amp; Templates</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Data &amp; Storage</span>
+        <a href="validation.html">Validation &amp; Sessions</a>
+        <a href="storage.html">Storage</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Operations</span>
+        <a href="logging.html">Logging &amp; Errors</a>
+        <a href="cli.html">Console (CLI)</a>
+        <a href="support.html">Support &amp; Example</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Runo</span>
+        <a href="runo.html">Overview &amp; setup</a>
+        <a href="runo-queries.html" class="is-active">Raw SQL &amp; results</a>
+        <a href="runo-records.html">Records &amp; query classes</a>
+        <a href="runo-builder.html">Builder &amp; transactions</a>
+      </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="docs-main">
+      <main class="docs-content">
+        <article class="doc-body">
+          <div class="page-meta"><span class="tag">Runo</span></div>
+          <h1>Runo — Raw SQL &amp; results</h1>
+          <p class="lead">Use <code>DB::prepare()</code> to create a <code>Statement</code>, bind values with <code>args()</code>, optionally cast/hydrate, then call <code>execute()</code> to get a <code>Result</code>.</p>
+
+
+          <h2>Raw queries</h2>
+<pre><code class="language-php">use Runo\DB;
+
+$result = DB::prepare(
+    'SELECT id, title, status FROM posts WHERE status = :status ORDER BY id DESC'
+)-&gt;args([
+    ':status' =&gt; 'published',
+])-&gt;execute();
+
+foreach ($result as $post) {
+    echo $post-&gt;title . PHP_EOL;
+}</code></pre>
+
+          <h2>Binding values</h2>
+          <p>Use named placeholders with leading colons. PDO types are inferred from PHP values:</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>PHP value</th><th>PDO parameter type</th></tr></thead>
+              <tbody>
+                <tr><td><code>int</code></td><td><code>PDO::PARAM_INT</code></td></tr>
+                <tr><td><code>bool</code></td><td><code>PDO::PARAM_BOOL</code></td></tr>
+                <tr><td><code>null</code></td><td><code>PDO::PARAM_NULL</code></td></tr>
+                <tr><td>floats/strings/others</td><td><code>PDO::PARAM_STR</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Inserting rows</h2>
+<pre><code class="language-php">$result = DB::prepare(
+    'INSERT INTO posts (title, status) VALUES (:title, :status)'
+)-&gt;args([
+    ':title'  =&gt; 'Hello from Runo',
+    ':status' =&gt; 'draft',
+])-&gt;execute();
+
+$id = $result-&gt;meta()-&gt;id;
+$affected = $result-&gt;meta()-&gt;affected;</code></pre>
+          <p><code>meta()-&gt;id</code> is populated only for statements starting with <code>INSERT</code> (from <code>PDO::lastInsertId()</code>, cast to int). The statement also exposes <code>$statement-&gt;id</code>.</p>
+
+          <h2>Updating rows</h2>
+<pre><code class="language-php">$result = DB::prepare(
+    'UPDATE posts SET title = :title WHERE id = :id'
+)-&gt;args([
+    ':title' =&gt; 'Updated title',
+    ':id'    =&gt; 1,
+])-&gt;execute();
+
+echo 'Updated rows: ' . $result-&gt;meta()-&gt;affected;</code></pre>
+
+          <h2>Deleting rows</h2>
+<pre><code class="language-php">$result = DB::prepare(
+    'DELETE FROM posts WHERE id = :id'
+)-&gt;args([':id' =&gt; 1])-&gt;execute();
+
+echo 'Deleted rows: ' . $result-&gt;meta()-&gt;affected;</code></pre>
+
+          <h2>Fetch behavior</h2>
+          <p><code>Statement::execute()</code> fetches all rows when the statement reports at least one column (<code>columnCount() &gt; 0</code>) via <code>fetchAll(PDO::FETCH_ASSOC)</code>. This covers <code>SELECT</code>, <code>SHOW</code>, <code>DESCRIBE</code>, <code>EXPLAIN</code>, etc. Results are eager (no lazy cursor).</p>
+
+          <h2>Working with results</h2>
+          <p><code>Result</code> implements <code>IteratorAggregate</code> and <code>Countable</code>.</p>
+<pre><code class="language-php">$result = DB::prepare('SELECT id, title FROM posts')-&gt;execute();
+
+foreach ($result as $post) { echo $post-&gt;title . PHP_EOL; }
+echo count($result);
+// echo $result-&gt;count();
+
+$post = $result-&gt;first();
+if ($post !== null) { echo $post-&gt;title; }
+
+$ids = $result-&gt;pluck('id');      // values via object access
+$titles = $result-&gt;pluck('title');
+
+$records = $result-&gt;toArray();    // array of Record objects (not scalar arrays)
+
+$rows = array_map(fn ($r) =&gt; $r-&gt;toArray(), $result-&gt;toArray());
+echo json_encode($rows, JSON_THROW_ON_ERROR);</code></pre>
+          <p><code>Result</code> and <code>Record</code> are not <code>JsonSerializable</code>; convert with <code>toArray()</code> before <code>json_encode()</code>.</p>
+
+          <h2>Query metadata</h2>
+<pre><code class="language-php">$meta = $result-&gt;meta();
+
+echo $meta-&gt;id;       // last insert ID (INSERT only; else 0)
+echo $meta-&gt;affected; // affected/returned row count
+echo $meta-&gt;time;     // execution time in seconds</code></pre>
+
+          <p class="page-edit">Part of the Lunaris documentation · <a href="https://codeberg.org/lunarisphp/runo" target="_blank" rel="noopener noreferrer">Source on Codeberg</a> · MIT License</p>
+
+
+          <nav class="page-nav">
+            <a class="page-prev" href="runo.html">
+              <span class="dir">← Previous</span>
+              <span class="title">Runo — Overview & setup</span>
+            </a>
+            <a class="page-next" href="runo-records.html">
+              <span class="dir">Next →</span>
+              <span class="title">Runo — Records & query classes</span>
+            </a>
+          </nav>
+
+          <p class="page-edit">Part of the Lunaris documentation · <a href="https://codeberg.org/lunarisphp/lunaris" target="_blank" rel="noopener noreferrer">Source on Codeberg</a> · MIT License</p>
+        </article>
+      </main>
+    </div>
+
+    <aside class="docs-toc" id="toc">
+      <div class="docs-toc__title">On this page</div>
+      <nav id="tocNav"></nav>
+    </aside>
+  </div>
+
+  <div class="search-modal" id="searchModal" role="dialog" aria-modal="true" aria-label="Search documentation">
+    <div class="search-modal__panel">
+      <div class="search-modal__input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="search-modal__input" id="searchInput" type="text" placeholder="Search the documentation…" autocomplete="off" spellcheck="false">
+        <span class="search-modal__esc">Esc</span>
+      </div>
+      <div class="search-results" id="searchResults"></div>
+      <div class="search-modal__foot">
+        <span><b>↑↓</b> navigate</span>
+        <span><b>↵</b> open</span>
+        <span><b>esc</b> close</span>
+      </div>
+    </div>
+  </div>
+
+  <script>window.LUNARIS_BASE = "../";</script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-dotenv.min.js"></script>
+  <script defer src="../assets/js/search-index.js"></script>
+  <script defer src="../assets/js/main.js"></script>
+</body>
+</html>

@@ -637,9 +637,279 @@ window.LUNARIS_SEARCH_INDEX = [
     "text": "Path is the guard used by LocalDriver . Given a root directory, it exposes:"
   },
   {
+    "crumb": "Documentation",
+    "title": "Runo — Overview & setup",
+    "url": "docs/runo.html",
+    "text": "Runo is the database engine for the Lunaris framework, but it works as a standalone library. It is intentionally not an ORM: a thin utility layer over PDO for executing plain SQL, binding values, hydrating rows into objects, casting, and managing transactions."
+  },
+  {
+    "crumb": "Runo — Overview & setup",
+    "title": "Philosophy",
+    "url": "docs/runo.html#philosophy",
+    "text": "Runo does not provide high-level abstractions like other ORMs. Instead, it encourages writing queries in plain SQL while providing bare-metal utilities such as a PDO wrapper. Raw SQL through DB::prepa"
+  },
+  {
+    "crumb": "Runo — Overview & setup",
+    "title": "Features",
+    "url": "docs/runo.html#features",
+    "text": "Static connection facade backed by one PDO instance"
+  },
+  {
+    "crumb": "Runo — Overview & setup",
+    "title": "Requirements",
+    "url": "docs/runo.html#requirements",
+    "text": "PHP 8.0 or newer (Docker image uses PHP 8.3)"
+  },
+  {
+    "crumb": "Runo — Overview & setup",
+    "title": "Installation",
+    "url": "docs/runo.html#installation",
+    "text": "Install with Composer:"
+  },
+  {
+    "crumb": "Runo — Overview & setup",
+    "title": "Quick start",
+    "url": "docs/runo.html#quick-start",
+    "text": "Configuration Key Required Example Description driver Yes mysql PDO driver used as the DSN prefix. host Yes 127.0.0.1 Database server hostname or IP address. port Yes 3306 Database server port. databa"
+  },
+  {
+    "crumb": "Runo — Overview & setup",
+    "title": "Configuration",
+    "url": "docs/runo.html#configuration",
+    "text": "Key Required Example Description driver Yes mysql PDO driver used as the DSN prefix. host Yes 127.0.0.1 Database server hostname or IP address. port Yes 3306 Database server port. database Yes app Dat"
+  },
+  {
+    "crumb": "Runo — Overview & setup",
+    "title": "Connection lifecycle",
+    "url": "docs/runo.html#connection-lifecycle",
+    "text": "The connection is stored in a static property and shared by every DB call."
+  },
+  {
+    "crumb": "Runo — Overview & setup",
+    "title": "Architecture",
+    "url": "docs/runo.html#architecture",
+    "text": "Project structure Local development with Docker From the project root: docker compose -f docker/docker-compose.yml up --build . Services include PHP 8.3 + Apache on :8080 and MariaDB 10.11 on :3306 ."
+  },
+  {
+    "crumb": "Runo — Overview & setup",
+    "title": "Project structure",
+    "url": "docs/runo.html#project-structure",
+    "text": "Local development with Docker From the project root: docker compose -f docker/docker-compose.yml up --build . Services include PHP 8.3 + Apache on :8080 and MariaDB 10.11 on :3306 ."
+  },
+  {
+    "crumb": "Runo — Overview & setup",
+    "title": "Local development with Docker",
+    "url": "docs/runo.html#local-development-with-docker",
+    "text": "From the project root: docker compose -f docker/docker-compose.yml up --build . Services include PHP 8.3 + Apache on :8080 and MariaDB 10.11 on :3306 ."
+  },
+  {
+    "crumb": "Runo — Overview & setup",
+    "title": "Known limitations",
+    "url": "docs/runo.html#known-limitations",
+    "text": "Only MySQL/MariaDB is targeted by the built-in DSN; one connection only."
+  },
+  {
+    "crumb": "Documentation",
+    "title": "Runo — Raw SQL & results",
+    "url": "docs/runo-queries.html",
+    "text": "Use DB::prepare() to create a Statement , bind values with args() , optionally cast/hydrate, then call execute() to get a Result ."
+  },
+  {
+    "crumb": "Runo — Raw SQL & results",
+    "title": "Raw queries",
+    "url": "docs/runo-queries.html#raw-queries",
+    "text": "Binding values Use named placeholders with leading colons. PDO types are inferred from PHP values:"
+  },
+  {
+    "crumb": "Runo — Raw SQL & results",
+    "title": "Binding values",
+    "url": "docs/runo-queries.html#binding-values",
+    "text": "Use named placeholders with leading colons. PDO types are inferred from PHP values:"
+  },
+  {
+    "crumb": "Runo — Raw SQL & results",
+    "title": "Inserting rows",
+    "url": "docs/runo-queries.html#inserting-rows",
+    "text": "meta()->id is populated only for statements starting with INSERT (from PDO::lastInsertId() , cast to int). The statement also exposes $statement->id ."
+  },
+  {
+    "crumb": "Runo — Raw SQL & results",
+    "title": "Updating rows",
+    "url": "docs/runo-queries.html#updating-rows",
+    "text": "Deleting rows Fetch behavior Statement::execute() fetches all rows when the statement reports at least one column ( columnCount() > 0 ) via fetchAll(PDO::FETCH_ASSOC) . This covers SELECT , SHOW , DES"
+  },
+  {
+    "crumb": "Runo — Raw SQL & results",
+    "title": "Deleting rows",
+    "url": "docs/runo-queries.html#deleting-rows",
+    "text": "Fetch behavior Statement::execute() fetches all rows when the statement reports at least one column ( columnCount() > 0 ) via fetchAll(PDO::FETCH_ASSOC) . This covers SELECT , SHOW , DESCRIBE , EXPLAI"
+  },
+  {
+    "crumb": "Runo — Raw SQL & results",
+    "title": "Fetch behavior",
+    "url": "docs/runo-queries.html#fetch-behavior",
+    "text": "Statement::execute() fetches all rows when the statement reports at least one column ( columnCount() > 0 ) via fetchAll(PDO::FETCH_ASSOC) . This covers SELECT , SHOW , DESCRIBE , EXPLAIN , etc. Result"
+  },
+  {
+    "crumb": "Runo — Raw SQL & results",
+    "title": "Working with results",
+    "url": "docs/runo-queries.html#working-with-results",
+    "text": "Result implements IteratorAggregate and Countable ."
+  },
+  {
+    "crumb": "Runo — Raw SQL & results",
+    "title": "Query metadata",
+    "url": "docs/runo-queries.html#query-metadata",
+    "text": "Part of the Lunaris documentation · Source on Codeberg · MIT License"
+  },
+  {
+    "crumb": "Documentation",
+    "title": "Runo — Records & query classes",
+    "url": "docs/runo-records.html",
+    "text": "Every row is hydrated into RunoSupportRecord unless another class is specified. Use cast() on a statement or $casts on a query class to convert values."
+  },
+  {
+    "crumb": "Runo — Records & query classes",
+    "title": "Records",
+    "url": "docs/runo-records.html#records",
+    "text": "Record supports magic access ( __get / __set / __isset ). Assigning properties only changes the in-memory object (no save() / update() / delete() )."
+  },
+  {
+    "crumb": "Runo — Records & query classes",
+    "title": "Casting values",
+    "url": "docs/runo-records.html#casting-values",
+    "text": "Cast Behavior 'int' Casts with (int) 'float' Casts with (float) 'bool' Casts with (bool) (note: string \"false\" becomes true ) 'json' If string, json_decode($value, true) ; invalid JSON becomes null Da"
+  },
+  {
+    "crumb": "Runo — Records & query classes",
+    "title": "Custom record classes",
+    "url": "docs/runo-records.html#custom-record-classes",
+    "text": "The class must extend Runo\\Support\\Record , otherwise Hydrator throws Exception(\"Invalid record class.\") ."
+  },
+  {
+    "crumb": "Runo — Records & query classes",
+    "title": "Class-level casts",
+    "url": "docs/runo-records.html#class-level-casts",
+    "text": "A record class's $casts is overwritten by the query's cast array by default; merge them in the constructor if you want defaults that can be overridden:"
+  },
+  {
+    "crumb": "Runo — Records & query classes",
+    "title": "Reusable query classes",
+    "url": "docs/runo-records.html#reusable-query-classes",
+    "text": "Query::run() passes SQL, args, casts, and record class to DB::prepare() . If your subclass overrides the constructor it must accept array $args = [] for Query::execute() ."
+  },
+  {
+    "crumb": "Runo — Records & query classes",
+    "title": "Combining Query with Sql",
+    "url": "docs/runo-records.html#combining-query-with-sql",
+    "text": "Sql bindings are not propagated automatically—assign $this->args = $query->args() inside sql() :"
+  },
+  {
+    "crumb": "Documentation",
+    "title": "Runo — Builder & transactions",
+    "url": "docs/runo-builder.html",
+    "text": "The Sql builder produces SQL strings and bindings but does not execute queries. Bindings use generated names like :p0 , :p1 ..."
+  },
+  {
+    "crumb": "Runo — Builder & transactions",
+    "title": "Using Sql",
+    "url": "docs/runo-builder.html#using-sql",
+    "text": "SELECT select() accepts column expressions; default is ['*'] ."
+  },
+  {
+    "crumb": "Runo — Builder & transactions",
+    "title": "SELECT",
+    "url": "docs/runo-builder.html#select",
+    "text": "select() accepts column expressions; default is ['*'] ."
+  },
+  {
+    "crumb": "Runo — Builder & transactions",
+    "title": "INSERT",
+    "url": "docs/runo-builder.html#insert",
+    "text": "Sql::raw() inserts the value verbatim (never pass untrusted input). Multiple insert() calls merge columns; the builder inserts one row per statement."
+  },
+  {
+    "crumb": "Runo — Builder & transactions",
+    "title": "UPDATE",
+    "url": "docs/runo-builder.html#update",
+    "text": "DELETE Safety update() and delete() have no built-in safety guard. Calling them without where() affects every row in the table."
+  },
+  {
+    "crumb": "Runo — Builder & transactions",
+    "title": "DELETE",
+    "url": "docs/runo-builder.html#delete",
+    "text": "Safety update() and delete() have no built-in safety guard. Calling them without where() affects every row in the table."
+  },
+  {
+    "crumb": "Runo — Builder & transactions",
+    "title": "WHERE conditions",
+    "url": "docs/runo-builder.html#where-conditions",
+    "text": "where(string|callable $column, ?string $operator = null, mixed $value = null) , orWhere() require an explicit operator:"
+  },
+  {
+    "crumb": "Runo — Builder & transactions",
+    "title": "WHERE IN",
+    "url": "docs/runo-builder.html#where-in",
+    "text": "whereIn() always joins with AND . An empty array produces IN () (invalid SQL) — guard against it."
+  },
+  {
+    "crumb": "Runo — Builder & transactions",
+    "title": "Nested WHERE groups",
+    "url": "docs/runo-builder.html#nested-where-groups",
+    "text": "Nested groups are syntactically supported but placeholder numbering can collide when combined with outer bindings (each Sql starts at :p0 ). Prefer flat conditions or raw SQL until this is addressed."
+  },
+  {
+    "crumb": "Runo — Builder & transactions",
+    "title": "JOIN",
+    "url": "docs/runo-builder.html#join",
+    "text": "Only inner JOIN is supported."
+  },
+  {
+    "crumb": "Runo — Builder & transactions",
+    "title": "ORDER BY, LIMIT, OFFSET",
+    "url": "docs/runo-builder.html#order-by-limit-offset",
+    "text": "orderBy() can be called multiple times; limit() / offset() accept integers. Using offset() without limit() may fail on MySQL."
+  },
+  {
+    "crumb": "Runo — Builder & transactions",
+    "title": "Builder method summary",
+    "url": "docs/runo-builder.html#builder-method-summary",
+    "text": "Method Description Returns Sql::table(string $table) Start a query Sql Sql::raw(string $value) Create a raw SQL fragment Raw select(array $columns) Set select columns (default ['*'] ) Sql insert(array"
+  },
+  {
+    "crumb": "Runo — Builder & transactions",
+    "title": "Transactions",
+    "url": "docs/runo-builder.html#transactions",
+    "text": "Commits on success, rolls back on any Throwable and rethrows it."
+  },
+  {
+    "crumb": "Runo — Builder & transactions",
+    "title": "Closure-based",
+    "url": "docs/runo-builder.html#closure-based",
+    "text": "Commits on success, rolls back on any Throwable and rethrows it."
+  },
+  {
+    "crumb": "Runo — Builder & transactions",
+    "title": "Manual",
+    "url": "docs/runo-builder.html#manual",
+    "text": "beginTransaction() does nothing if already active; commit() / rollback() check inTransaction() . No nested transactions/savepoints."
+  },
+  {
+    "crumb": "Runo — Builder & transactions",
+    "title": "Error handling and security",
+    "url": "docs/runo-builder.html#error-handling-and-security",
+    "text": "DB::prepare() before DB::init() throws Exception(\"Database not initialized.\") ."
+  },
+  {
+    "crumb": "Runo — Builder & transactions",
+    "title": "API reference",
+    "url": "docs/runo-builder.html#api-reference",
+    "text": "Class Notes Runo\\DB init() , prepare() , transaction() , beginTransaction() , commit() , rollback() Runo\\Database\\Statement args() , cast() , as() , execute() , $id Runo\\Database\\Query abstract sql() "
+  },
+  {
     "crumb": "Ecosystem",
-    "title": "Atlas — Coming soon",
-    "url": "atlas.html",
-    "text": "The minimal database engine for Lunaris: raw SQL, Probe query builder, Planet models, Capsule DTOs."
+    "title": "Runo — Database engine for Lunaris",
+    "url": "runo.html",
+    "text": "Runo is a minimal PDO database client and query builder for PHP. Raw SQL first, optional SQL builder, records and casts, query classes, and transactions."
   }
 ];

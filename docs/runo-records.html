@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Runo — Records & query classes — Lunaris Documentation</title>
+  <meta name="description" content="Hydrate rows into Record objects, apply casts, use custom record classes, and build reusable Query classes.">
+  <meta name="theme-color" content="#6d4aff">
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/prism-lunaris.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <button class="icon-btn" id="sidebarToggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <a class="brand" href="../" aria-label="Lunaris home">
+        <img src="../assets/img/logo-bg.png" alt="">
+        <span>Lunaris<em>.</em></span>
+      </a>
+      <nav class="header-nav" aria-label="Primary">
+        <a href="index.html" class="is-active">Documentation</a>
+        <a href="../runo.html">Runo</a>
+        <a href="../index.html#features">Features</a>
+        <a href="../index.html#ecosystem">Ecosystem</a>
+      </nav>
+      <div class="header-actions">
+        <button class="search-trigger" type="button" data-search-open aria-label="Search documentation">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span class="st-label">Search docs</span>
+          <kbd>Ctrl K</kbd>
+        </button>
+        <a class="btn btn-primary btn-sm" href="installation.html">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="docs-shell">
+    <aside class="docs-sidebar" id="docsSidebar">
+      <div class="nav-group">
+        <span class="nav-group__title">Getting Started</span>
+        <a href="index.html">Introduction</a>
+        <a href="installation.html">Installation</a>
+        <a href="architecture.html">Architecture</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Core</span>
+        <a href="configuration.html">Configuration</a>
+        <a href="routing.html">Routing</a>
+        <a href="actions.html">Actions &amp; Responses</a>
+        <a href="middlewares.html">Middlewares &amp; Security</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Front-end</span>
+        <a href="views.html">Views &amp; Templates</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Data &amp; Storage</span>
+        <a href="validation.html">Validation &amp; Sessions</a>
+        <a href="storage.html">Storage</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Operations</span>
+        <a href="logging.html">Logging &amp; Errors</a>
+        <a href="cli.html">Console (CLI)</a>
+        <a href="support.html">Support &amp; Example</a>
+      </div>
+      <div class="nav-group">
+        <span class="nav-group__title">Runo</span>
+        <a href="runo.html">Overview &amp; setup</a>
+        <a href="runo-queries.html">Raw SQL &amp; results</a>
+        <a href="runo-records.html" class="is-active">Records &amp; query classes</a>
+        <a href="runo-builder.html">Builder &amp; transactions</a>
+      </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="docs-main">
+      <main class="docs-content">
+        <article class="doc-body">
+          <div class="page-meta"><span class="tag">Runo</span></div>
+          <h1>Runo — Records &amp; query classes</h1>
+          <p class="lead">Every row is hydrated into <code>RunoSupportRecord</code> unless another class is specified. Use <code>cast()</code> on a statement or <code>$casts</code> on a query class to convert values.</p>
+
+
+          <h2>Records</h2>
+<pre><code class="language-php">$result = DB::prepare('SELECT id, title FROM posts')-&gt;execute();
+$post = $result-&gt;first();
+
+echo $post-&gt;id;
+echo $post-&gt;title;
+
+$attributes = $post-&gt;toArray();</code></pre>
+          <p><code>Record</code> supports magic access (<code>__get</code>/<code>__set</code>/<code>__isset</code>). Assigning properties only changes the in-memory object (no <code>save()</code>/<code>update()</code>/<code>delete()</code>).</p>
+
+          <h2>Casting values</h2>
+<pre><code class="language-php">use Runo\DB;
+
+$result = DB::prepare(
+    'SELECT id, is_published, score, tags, created_at FROM posts'
+)-&gt;cast([
+    'id'           =&gt; 'int',
+    'is_published' =&gt; 'bool',
+    'score'        =&gt; 'float',
+    'tags'         =&gt; 'json',
+    'created_at'   =&gt; DateTimeImmutable::class,
+])-&gt;execute();
+
+$post = $result-&gt;first();
+// $post-&gt;id (int), $post-&gt;is_published (bool), $post-&gt;score (float),
+// $post-&gt;tags (array), $post-&gt;created_at (DateTimeImmutable)</code></pre>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Cast</th><th>Behavior</th></tr></thead>
+              <tbody>
+                <tr><td><code>'int'</code></td><td>Casts with <code>(int)</code></td></tr>
+                <tr><td><code>'float'</code></td><td>Casts with <code>(float)</code></td></tr>
+                <tr><td><code>'bool'</code></td><td>Casts with <code>(bool)</code> (note: string <code>"false"</code> becomes <code>true</code>)</td></tr>
+                <tr><td><code>'json'</code></td><td>If string, <code>json_decode($value, true)</code>; invalid JSON becomes <code>null</code></td></tr>
+                <tr><td><code>DateTimeInterface</code> class</td><td><code>new $class($value)</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Casts are only applied when the column is present and not <code>null</code>. Missing cast strings are ignored.</p>
+
+          <h2>Custom record classes</h2>
+<pre><code class="language-php">use Runo\Support\Record;
+
+final class Post extends Record
+{
+    public function excerpt(int $length = 100): string
+    {
+        return substr((string) $this-&gt;title, 0, $length);
+    }
+}</code></pre>
+<pre><code class="language-php">use Runo\DB;
+
+$result = DB::prepare('SELECT id, title FROM posts')
+    -&gt;as(Post::class)
+    -&gt;cast(['id' =&gt; 'int'])
+    -&gt;execute();
+
+$post = $result-&gt;first();
+echo get_class($post); // Post
+echo $post-&gt;excerpt(40);</code></pre>
+          <p>The class must extend <code>Runo\Support\Record</code>, otherwise <code>Hydrator</code> throws <code>Exception("Invalid record class.")</code>.</p>
+
+          <h2>Class-level casts</h2>
+          <p>A record class's <code>$casts</code> is overwritten by the query's cast array by default; merge them in the constructor if you want defaults that can be overridden:</p>
+<pre><code class="language-php">final class CastedPost extends Record
+{
+    protected array $casts = [
+        'id'         =&gt; 'int',
+        'created_at' =&gt; DateTimeImmutable::class,
+    ];
+
+    public function __construct(array|object $attributes = [], array $casts = [])
+    {
+        parent::__construct($attributes, array_merge($this-&gt;casts, $casts));
+    }
+}</code></pre>
+
+          <h2>Reusable query classes</h2>
+<pre><code class="language-php">use Runo\Database\Query;
+
+final class PublishedPosts extends Query
+{
+    protected array $casts = ['id' =&gt; 'int'];
+    protected static ?string $recordClass = Post::class;
+
+    public function sql(): string
+    {
+        return 'SELECT id, title, created_at
+                FROM posts
+                WHERE status = :status
+                ORDER BY id DESC';
+    }
+}</code></pre>
+<pre><code class="language-php">$posts = PublishedPosts::execute([':status' =&gt; 'published']);
+// or
+$query = new PublishedPosts([':status' =&gt; 'draft']);
+$posts = $query-&gt;run();</code></pre>
+          <p><code>Query::run()</code> passes SQL, args, casts, and record class to <code>DB::prepare()</code>. If your subclass overrides the constructor it must accept <code>array $args = []</code> for <code>Query::execute()</code>.</p>
+
+          <h2>Combining Query with Sql</h2>
+          <p><code>Sql</code> bindings are not propagated automatically—assign <code>$this-&gt;args = $query-&gt;args()</code> inside <code>sql()</code>:</p>
+<pre><code class="language-php">use Runo\Database\Query;
+use Runo\Support\Sql;
+
+final class ActivePosts extends Query
+{
+    protected array $casts = ['id' =&gt; 'int'];
+
+    public function sql(): string
+    {
+        $query = Sql::table('posts')
+            -&gt;select(['id', 'title'])
+            -&gt;where('status', '=', 'published')
+            -&gt;orderBy('id', 'DESC');
+
+        $this-&gt;args = $query-&gt;args();
+        return $query-&gt;toString();
+    }
+}</code></pre>
+
+          <p class="page-edit">Part of the Lunaris documentation · <a href="https://codeberg.org/lunarisphp/runo" target="_blank" rel="noopener noreferrer">Source on Codeberg</a> · MIT License</p>
+
+
+          <nav class="page-nav">
+            <a class="page-prev" href="runo-queries.html">
+              <span class="dir">← Previous</span>
+              <span class="title">Runo — Raw SQL & results</span>
+            </a>
+            <a class="page-next" href="runo-builder.html">
+              <span class="dir">Next →</span>
+              <span class="title">Runo — Builder & transactions</span>
+            </a>
+          </nav>
+
+          <p class="page-edit">Part of the Lunaris documentation · <a href="https://codeberg.org/lunarisphp/lunaris" target="_blank" rel="noopener noreferrer">Source on Codeberg</a> · MIT License</p>
+        </article>
+      </main>
+    </div>
+
+    <aside class="docs-toc" id="toc">
+      <div class="docs-toc__title">On this page</div>
+      <nav id="tocNav"></nav>
+    </aside>
+  </div>
+
+  <div class="search-modal" id="searchModal" role="dialog" aria-modal="true" aria-label="Search documentation">
+    <div class="search-modal__panel">
+      <div class="search-modal__input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="search-modal__input" id="searchInput" type="text" placeholder="Search the documentation…" autocomplete="off" spellcheck="false">
+        <span class="search-modal__esc">Esc</span>
+      </div>
+      <div class="search-results" id="searchResults"></div>
+      <div class="search-modal__foot">
+        <span><b>↑↓</b> navigate</span>
+        <span><b>↵</b> open</span>
+        <span><b>esc</b> close</span>
+      </div>
+    </div>
+  </div>
+
+  <script>window.LUNARIS_BASE = "../";</script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-dotenv.min.js"></script>
+  <script defer src="../assets/js/search-index.js"></script>
+  <script defer src="../assets/js/main.js"></script>
+</body>
+</html>
